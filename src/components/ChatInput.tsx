@@ -28,7 +28,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled }) => {
           placeholder="Ask about the mysteries of Hawkins..."
           className="flex-1 p-5 rounded-lg bg-gray-900/50 text-white border-2 border-red-900/30 
                      focus:border-red-500 focus:outline-none transition-all duration-300 
-                     placeholder-red-200/20 input-focus-effect text-lg"
+                     placeholder-red-400 input-focus-effect text-lg"
         />
         <button
           type="submit"
@@ -38,7 +38,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled }) => {
                      hover:shadow-lg hover:shadow-red-900/30 flex items-center gap-2"
         >
           <Send size={20} />
-          <Skull size={16} className="animate-pulse" />
         </button>
       </div>
     </form>

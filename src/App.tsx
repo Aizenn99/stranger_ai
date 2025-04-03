@@ -3,10 +3,10 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
 import { Message, ChatState } from './types';
-import { Brain, Zap, Skull } from 'lucide-react';
+import { Skull } from 'lucide-react';
 
 // Initialize Gemini AI
-const genAI = new GoogleGenerativeAI("AIzaSyCyTZv2wL4H99dK1EY1sz8sCDBwVQCUO3k");
+const genAI = new GoogleGenerativeAI("YOUR_GEMINI_API_KEY");
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
 const STRANGER_THINGS_PROMPT = `You are an AI assistant themed after Stranger Things. 
@@ -27,18 +27,25 @@ function App() {
   });
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const [particles, setParticles] = useState<{ id: number; style: React.CSSProperties }[]>([]);
+  const [skulls, setSkulls] = useState<{ id: number; size: number; style: React.CSSProperties }[]>([]);
 
   useEffect(() => {
-    const newParticles = Array.from({ length: 20 }, (_, i) => ({
-      id: i,
-      style: {
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 5}s`,
-      },
-    }));
-    setParticles(newParticles);
+    const newSkulls = Array.from({ length: 25 }, (_, i) => {
+      const size = Math.random() * 40 + 20; // Size between 20px and 60px
+      return {
+        id: i,
+        size,
+        style: {
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          width: `${size}px`,
+          height: `${size}px`,
+          animationDelay: `${Math.random() * 3}s`,
+          opacity: Math.random() * 0.7 + 0.3, // Random opacity between 0.3 and 1
+        },
+      };
+    });
+    setSkulls(newSkulls);
   }, []);
 
   const scrollToBottom = () => {
@@ -96,69 +103,75 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
-      {/* Floating particles */}
-      {particles.map(particle => (
-        <div
-          key={particle.id}
-          className="floating-particle"
-          style={particle.style}
-        />
-      ))}
+    <div className="min-h-screen bg-black flex flex-col relative">
+      {/* Floating Skulls - Full Screen */}
+      <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
+        {skulls.map(skull => (
+          <Skull
+            key={skull.id}
+            size={skull.size}
+            className="absolute text-red-500 animate-floating"
+            style={skull.style}
+          />
+        ))}
+      </div>
 
       {/* Header */}
-      
-<header className="bg-black/80 p-6 border-b border-red-900/40 relative shadow-lg shadow-red-900/10">
-  <div className="flex items-center justify-between max-w-5xl mx-auto">
-    {/* Left: Logo */}
-    <div className="flex items-center gap-4">
-      <div className="relative">
-        <Brain className="text-red-500 drop-shadow-[0_0_10px_rgba(255,0,0,0.8)]" size={42} />
-        <div className="absolute -top-2 -right-2">
-          <Zap className="text-yellow-500" size={18} />
+      <header className="bg-black/80 p-4 md:p-6 border-b border-red-900/40 shadow-lg shadow-red-900/10 relative z-10">
+        <div className="flex items-center justify-between max-w-screen-lg mx-auto w-full">        
+          {/* Stranger Things Logo (Centered) */}
+          <div className="flex-1 flex justify-center">
+            <img 
+              src="/assets/logo.png"
+              alt="Stranger Things Logo"
+              className="h-16 md:h-24 object-contain"
+            />
+          </div>
         </div>
-      </div>
-      <h1 className="text-4xl stranger-title text-red-500 tracking-wider drop-shadow-[0_0_10px_rgba(255,0,0,0.6)]">
-        Stranger AI
-      </h1>
-    </div>
-
-
-    {/* Right: Icon */}
-    <div className="relative">
-      <Skull className="text-red-500 drop-shadow-[0_0_10px_rgba(255,0,0,0.8)]" size={36} />
-      <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
-    </div>
-  </div>
-</header>
-
+      </header>
 
       {/* Chat Container */}
       <div 
-        ref={chatContainerRef}
-        className="flex-1 overflow-y-auto chat-container relative"
-      >
-        {chatState.messages.length === 0 && (
-          <div className="flex items-center justify-center h-full text-red-500 opacity-50 flex-col gap-4">
-            <Skull size={60} className="animate-pulse" />
-            <p className="text-2xl stranger-title">Enter the Upside Down...</p>
-            <p className="text-sm opacity-70 stranger-title">Ask me anything about Hawkins...</p>
-          </div>
-        )}
-        {chatState.messages.map((message, index) => (
-          <ChatMessage key={index} message={message} />
-        ))}
-        {chatState.isLoading && (
-          <div className="p-8 text-red-500 flex justify-center items-center gap-3">
-            <div className="w-4 h-4 bg-red-500 rounded-full loading-dot" style={{ animationDelay: '0s' }}></div>
-            <div className="w-4 h-4 bg-red-500 rounded-full loading-dot" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-4 h-4 bg-red-500 rounded-full loading-dot" style={{ animationDelay: '0.4s' }}></div>
-          </div>
-        )}
+          ref={chatContainerRef}
+          className="flex-1 overflow-y-auto chat-container relative z-10 h-[calc(100vh-120px)] md:h-[calc(100vh-160px)] max-w-screen-lg mx-auto w-full px-4 flex items-center justify-center"
+        >
+          {chatState.messages.length === 0 && (
+            <div className="text-red-500 opacity-80 text-center">
+              <p className="text-2xl stranger-title">Enter the Upside Down...</p>
+              <p className="text-sm stranger-title opacity-70">Ask me anything about Hawkins...</p>
+            </div>
+          )}
+          {chatState.messages.map((message, index) => (
+            <ChatMessage key={index} message={message} />
+          ))}
+          {chatState.isLoading && (
+            <div className="p-8 text-red-500 flex justify-center items-center gap-3">
+              <div className="w-4 h-4 bg-red-500 rounded-full loading-dot animate-bounce" style={{ animationDelay: '0s' }}></div>
+              <div className="w-4 h-4 bg-red-500 rounded-full loading-dot animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-4 h-4 bg-red-500 rounded-full loading-dot animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+            </div>
+          )}
       </div>
 
+
       {/* Input */}
-      <ChatInput onSend={handleSend} disabled={chatState.isLoading} />
+      <div className="px-4 max-w-screen-lg mx-auto w-full relative z-10">
+        <ChatInput onSend={handleSend} disabled={chatState.isLoading} />
+      </div>
+
+      {/* Floating Animation */}
+      <style>
+        {`
+          @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+          }
+          .animate-floating {
+            animation: floating 5s infinite ease-in-out;
+          }
+        `}
+      </style>
     </div>
   );
 }
