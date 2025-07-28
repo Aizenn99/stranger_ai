@@ -137,7 +137,7 @@ function App() {
         >
           {chatState.messages.length === 0 && (
             <div className="text-red-500 opacity-80 text-center">
-              <p className="text-2xl stranger-title">Enter the Upside Down...</p>
+              <p className="text-2xl stranger-title">Enter the Upside Down....</p>
               <p className="text-sm stranger-title opacity-70">Ask me anything about Hawkins...</p>
             </div>
           )}
